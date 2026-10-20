@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Kota Boutique - Couture & Tailoring Studio</title>
+  <script src="./vendor/react.js"></script>
+  <script src="./vendor/react-dom.js"></script>
+  <script src="./support.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'DM Sans', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body>
+  <x-dc>
+    <helmet>
+      <style>
+        body { margin: 0; font-family: 'DM Sans', Arial, sans-serif; background: #F8F9F8; color: #10231F; }
+      </style>
+    </helmet>
+    
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+        const [currentSlide, setCurrentSlide] = useState(0);
+        const [cart, setCart] = useState([]);
+        const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+        const [checkoutStep, setCheckoutStep] = useState('form'); // 'form' | 'razorpay' | 'success'
+        const [customerInfo, setCustomerInfo] = useState({ name: '', whatsapp: '', address: '', notes: '' });
+        const [selectedProductForBuy, setSelectedProductForBuy] = useState(null);
+        const [orderReceipt, setOrderReceipt] = useState(null);
+
+        const heroSlides = [
+          {
+            title: "Royal Bridal Lehengas",
+            subtitle: "Handcrafted masterworks tailored to your exact measurements in Udaipur.",
+            image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1600&q=80",
+            badge: "Signature Collection"
+          },
+          {
+            title: "Exquisite Designer Blouses",
+            subtitle: "Precision cuts, luxurious fabrics, and impeccable fitting.",
+            image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1600&q=80",
+            badge: "Custom Tailoring"
+          },
+          {
+            title: "Elegance in Every Stitch",
+            subtitle: "Kurtis, Suits & Blazer Sets crafted for the modern wardrobe.",
+            image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=80",
+            badge: "Ready & Custom"
+          }
+        ];
+
+        useEffect(() => {
+          const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+          }, 5000);
+          return () => clearInterval(timer);
+        }, [heroSlides.length]);
+
+        const products = [
+          { id: 1, name: "Bridal Lehenga", category: "Bridal & Occasion", price: 4000, image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80", desc: "Custom bridal lehenga stitching with intricate detailing support." },
+          { id: 2, name: "Designer Blouses", category: "Bridal & Occasion", price: 2500, image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80", desc: "Fitted designer blouses with padding and custom necklines." },
+          { id: 3, name: "Banarasi Koti", category: "Bridal & Occasion", price: 1200, image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80", desc: "Traditional Banarasi woven koti jacket tailored for occasions." },
+          { id: 4, name: "Only Kurti", category: "Kurtis & Suits", price: 700, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80", desc: "Everyday comfortable kurtis stitched to perfection." },
+          { id: 5, name: "Designer Kurti", category: "Kurtis & Suits", price: 1200, image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80", desc: "Stylized designer kurti with unique cuts and embellishments." },
+          { id: 6, name: "Pant + Kurti (Full Lining)", category: "Kurtis & Suits", price: 1500, image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80", desc: "Complete outfit set with full comfort lining." },
+          { id: 7, name: "Suit (Without Lining)", category: "Kurtis & Suits", price: 1000, image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80", desc: "Standard traditional suit stitching." },
+          { id: 8, name: "Pant (With Lining)", category: "Pants & Finishing", price: 600, image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80", desc: "Tailored trousers and pants with soft lining." },
+          { id: 9, name: "Pant (Without Lining)", category: "Pants & Finishing", price: 500, image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80", desc: "Standard tailored trousers." },
+          { id: 10, name: "Fall & Pico", category: "Pants & Finishing", price: 200, image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80", desc: "Saree fall attachment and edge pico finishing." },
+          { id: 11, name: "Blazer + Pant", category: "Blazer Sets", price: 6000, image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80", desc: "Sharp formal ladies blazer and matching trousers." },
+          { id: 12, name: "Blazer + Pant + Blouse", category: "Blazer Sets", price: 8000, image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80", desc: "Complete premium 3-piece formal ensemble." }
+        ];
+
+        const addToCart = (product) => {
+          const existing = cart.find(item => item.id === product.id);
+          if (existing) {
+            setCart(cart.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item));
+          } else {
+            setCart([...cart, { ...product, qty: 1 }]);
+          }
+        };
+
+        const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+        const handleBuyNow = (product) => {
+          setSelectedProductForBuy(product);
+          setCart([{ ...product, qty: 1 }]);
+          setIsCheckoutOpen(true);
+          setCheckoutStep('form');
+        };
+
+        const handleCartCheckout = () => {
+          if (cart.length === 0) return;
+          setSelectedProductForBuy(null);
+          setIsCheckoutOpen(true);
+          setCheckoutStep('form');
+        };
+
+        const proceedToRazorpay = (e) => {
+          e.preventDefault();
+          if (!customerInfo.name || !customerInfo.whatsapp || !customerInfo.address) {
+            alert('Please fill in Name, WhatsApp Number, and Address.');
+            return;
+          }
+          setCheckoutStep('razorpay');
+        };
+
+        const simulateRazorpayPayment = () => {
+          const total = cartTotal > 0 ? cartTotal : (selectedProductForBuy ? selectedProductForBuy.price : 0);
+          const receipt = {
+            orderId: 'KB-' + Math.floor(100000 + Math.random() * 900000),
+            date: new Date().toLocaleString(),
+            name: customerInfo.name,
+            whatsapp: customerInfo.whatsapp,
+            address: customerInfo.address,
+            items: cart.length > 0 ? cart : [selectedProductForBuy],
+            total: total,
+            paymentId: 'pay_rzp_' + Math.random().toString(36).substring(2, 11)
+          };
+          setOrderReceipt(receipt);
+          setCheckoutStep('success');
+        };
+
+        return (
+          <div className="min-h-screen bg-[#F8F9F8] text-[#10231F]">
+            {/* Top Notification Banner */}
+            <div className="bg-[#14463D] text-[#E8A317] text-xs md:text-sm font-semibold py-2 px-4 text-center tracking-wider">
+              ✨ Welcome to Kota Boutique | Udaipur's Premier Custom Tailoring & Designer Studio ✨
+            </div>
+
+            {/* Header */}
+            <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#DCE5E1] shadow-sm">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <a href="#top" className="flex items-center gap-3 group">
+                  <div className="w-11 h-11 rounded-xl bg-[#14463D] text-[#E8A317] flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-105 transition-transform" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                    KB
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-2xl tracking-tight text-[#14463D]" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                      Kota Boutique
+                    </span>
+                    <span className="text-[11px] uppercase tracking-widest text-[#E8A317] font-bold">
+                      Couture & Tailoring
+                    </span>
+                  </div>
+                </a>
+
+                <nav className="hidden md:flex items-center gap-8 font-medium text-[#10231F]">
+                  <a href="#home" className="hover:text-[#14463D] transition-colors">Home</a>
+                  <a href="#services" className="hover:text-[#14463D] transition-colors">Services & Prices</a>
+                  <a href="#catalog" className="hover:text-[#14463D] transition-colors">Designer Catalog</a>
+                  <a href="#process" className="hover:text-[#14463D] transition-colors">How It Works</a>
+                  <a href="#contact" className="hover:text-[#14463D] transition-colors">Contact</a>
+                </nav>
+
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => {
+                      if(cart.length === 0) {
+                        alert("Your cart is empty. Choose a service or product first!");
+                      } else {
+                        handleCartCheckout();
+                      }
+                    }}
+                    className="relative p-2.5 rounded-full bg-[#F3F6F4] text-[#14463D] hover:bg-[#14463D] hover:text-white transition-all flex items-center gap-2 px-4 shadow-sm"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <span className="font-bold text-sm">{cart.reduce((a,c)=>a+c.qty,0)}</span>
+                  </button>
+
+                  <a 
+                    href="tel:+918955717451" 
+                    className="hidden lg:inline-flex items-center justify-center bg-[#14463D] text-white px-5 py-2.5 rounded-full font-bold text-sm shadow-md hover:bg-[#1b5d51] transition-all"
+                  >
+                    Book Fitting
+                  </a>
+
+                  <button 
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="md:hidden p-2 rounded-lg text-[#14463D]"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {mobileMenuOpen ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                      )}
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {mobileMenuOpen && (
+                <div className="md:hidden bg-white border-b border-[#DCE5E1] px-6 py-4 flex flex-col gap-4 shadow-lg">
+                  <a href="#home" onClick={()=>setMobileMenuOpen(false)} className="font-medium text-lg">Home</a>
+                  <a href="#services" onClick={()=>setMobileMenuOpen(false)} className="font-medium text-lg">Services & Prices</a>
+                  <a href="#catalog" onClick={()=>setMobileMenuOpen(false)} className="font-medium text-lg">Designer Catalog</a>
+                  <a href="#process" onClick={()=>setMobileMenuOpen(false)} className="font-medium text-lg">How It Works</a>
+                  <a href="#contact" onClick={()=>setMobileMenuOpen(false)} className="font-medium text-lg">Contact</a>
+                  <a href="tel:+918955717451" className="bg-[#14463D] text-white py-3 rounded-xl text-center font-bold">Call +91 89557 17451</a>
+                </div>
+              )}
+            </header>
+
+            {/* Hero Header Slider */}
+            <section id="home" className="relative bg-[#14463D] text-white overflow-hidden py-20 lg:py-32">
+              <div className="absolute inset-0 opacity-25">
+                <img 
+                  src={heroSlides[currentSlide].image} 
+                  alt="Hero Background" 
+                  className="w-full h-full object-cover transition-all duration-1000 scale-105"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#14463D] via-[#14463D]/90 to-transparent"></div>
+
+              <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-12">
+                <div className="flex-1 max-w-2xl">
+                  <span className="inline-block bg-[#E8A317] text-[#10231F] font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-4 shadow">
+                    {heroSlides[currentSlide].badge}
+                  </span>
+                  <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                    {heroSlides[currentSlide].title}
+                  </h1>
+                  <p className="text-lg sm:text-xl text-[#E3ECE8] mb-8 font-light leading-relaxed">
+                    {heroSlides[currentSlide].subtitle} Located in Chitrakoot Nagar, Udaipur. Fast turnaround, transparent pricing, and instant WhatsApp updates.
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    <a 
+                      href="#catalog" 
+                      className="bg-[#E8A317] text-[#10231F] px-8 py-4 rounded-full font-bold shadow-lg hover:bg-[#d89510] transition-all"
+                    >
+                      Explore & Buy Now
+                    </a>
+                    <a 
+                      href="#services" 
+                      className="border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-[#14463D] transition-all"
+                    >
+                      View Price List
+                    </a>
+                  </div>
+
+                  <div className="flex gap-2 mt-12">
+                    {heroSlides.map((_, idx) => (
+                      <button 
+                        key={idx} 
+                        onClick={() => setCurrentSlide(idx)}
+                        className={`w-3 h-3 rounded-full transition-all ${currentSlide === idx ? 'bg-[#E8A317] w-8' : 'bg-white/40'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="w-full lg:w-[400px] bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl">
+                  <div className="text-[#E8A317] font-bold text-xs uppercase tracking-widest mb-3">Instant Stitching Starting Rates</div>
+                  <div className="space-y-3 divide-y divide-white/10 text-sm">
+                    <div className="flex justify-between pt-2"><span>Fall & Pico</span><b className="text-[#E8A317]">₹200</b></div>
+                    <div className="flex justify-between pt-3"><span>Only Kurti</span><b className="text-[#E8A317]">₹700</b></div>
+                    <div className="flex justify-between pt-3"><span>Designer Blouses</span><b className="text-[#E8A317]">₹2,500</b></div>
+                    <div className="flex justify-between pt-3"><span>Bridal Lehenga</span><b className="text-[#E8A317]">₹4,000</b></div>
+                  </div>
+                  <a href="#services" className="block text-center mt-6 py-3 bg-white/20 hover:bg-white/30 rounded-xl font-bold text-sm transition-all">
+                    See All Services & Prices →
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            {/* Services & Prices Section */}
+            <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="text-[#14463D] font-bold text-xs uppercase tracking-widest">Transparent Rates</span>
+                <h2 className="text-3xl sm:text-5xl font-bold mt-2 mb-4" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                  Services & Price List
+                </h2>
+                <p className="text-gray-600 text-lg">Every custom piece priced fairly with professional finishing in Udaipur.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="bg-white border border-[#DCE5E1] rounded-2xl p-6 shadow-sm">
+                  <span className="text-[#14463D] font-bold text-sm">01</span>
+                  <h3 className="text-2xl font-bold mt-1 mb-6" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Bridal & Occasion</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Bridal Lehenga</span><b className="text-[#14463D]">₹4,000</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Designer Blouses</span><b className="text-[#14463D]">₹2,500</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Banarasi Koti</span><b className="text-[#14463D]">₹1,200</b></div>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-[#DCE5E1] rounded-2xl p-6 shadow-sm">
+                  <span className="text-[#14463D] font-bold text-sm">02</span>
+                  <h3 className="text-2xl font-bold mt-1 mb-6" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Kurtis & Suits</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Only Kurti</span><b className="text-[#14463D]">₹700</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Designer Kurti</span><b className="text-[#14463D]">₹1,200</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Pant + Kurti (Lining)</span><b className="text-[#14463D]">₹1,500</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Suit (No Lining)</span><b className="text-[#14463D]">₹1,000</b></div>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-[#DCE5E1] rounded-2xl p-6 shadow-sm">
+                  <span className="text-[#14463D] font-bold text-sm">03</span>
+                  <h3 className="text-2xl font-bold mt-1 mb-6" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Pants & Finishing</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Pant (With Lining)</span><b className="text-[#14463D]">₹600</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Pant (No Lining)</span><b className="text-[#14463D]">₹500</b></div>
+                    <div className="flex justify-between border-t border-gray-100 pt-3 text-sm"><span>Fall & Pico</span><b className="text-[#14463D]">₹200</b></div>
+                  </div>
+                </div>
+
+                <div className="bg-[#14463D] text-white rounded-2xl p-6 shadow-lg">
+                  <span className="text-[#E8A317] font-bold text-sm">04</span>
+                  <h3 className="text-2xl font-bold mt-1 mb-6" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Blazer Sets</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between border-t border-white/20 pt-3 text-sm"><span>Blazer + Pant</span><b className="text-[#E8A317]">₹6,000</b></div>
+                    <div className="flex justify-between border-t border-white/20 pt-3 text-sm"><span>Blazer + Pant + Blouse</span><b className="text-[#E8A317]">₹8,000</b></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* AI Product Catalog & Instant Buy Section */}
+            <section id="catalog" className="bg-[#F3F6F4] py-24 px-4 sm:px-6 lg:px-8">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                  <div>
+                    <span className="text-[#14463D] font-bold text-xs uppercase tracking-widest">AI Generated Collection</span>
+                    <h2 className="text-3xl sm:text-5xl font-bold mt-2" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                      Designer Products & Services
+                    </h2>
+                  </div>
+                  <p className="text-gray-600 max-w-md">Click "Buy Now" to checkout instantly without creating an account or login.</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {products.map((product) => (
+                    <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#DCE5E1] shadow-sm hover:shadow-xl transition-all flex flex-col justify-between group">
+                      <div>
+                        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                          <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#14463D] text-xs font-bold px-3 py-1 rounded-full shadow">
+                            {product.category}
+                          </span>
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold mb-2" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>{product.name}</h3>
+                          <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.desc}</p>
+                          <div className="text-2xl font-extrabold text-[#14463D]">₹{product.price.toLocaleString()}</div>
+                        </div>
+                      </div>
+                      <div className="p-6 pt-0 flex items-center gap-3">
+                        <button 
+                          onClick={() => handleBuyNow(product)}
+                          className="flex-1 bg-[#14463D] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#1b5d51] transition-colors shadow-md"
+                        >
+                          Buy Now
+                        </button>
+                        <button 
+                          onClick={() => {
+                            addToCart(product);
+                            alert(`Added ${product.name} to your booking bag!`);
+                          }}
+                          className="px-4 py-3 bg-[#F3F6F4] text-[#14463D] rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors"
+                        >
+                          + Bag
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* How It Works Section */}
+            <section id="process" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                <span className="text-[#14463D] font-bold text-xs uppercase tracking-widest">Seamless Experience</span>
+                <h2 className="text-3xl sm:text-5xl font-bold mt-2" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                  Three Steps to a Perfect Fit.
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div className="bg-white p-8 rounded-2xl border border-[#DCE5E1] shadow-sm">
+                  <div className="text-6xl font-bold text-[#14463D] mb-4" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>01</div>
+                  <h3 className="text-2xl font-bold mb-3" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Book & Pay Online</h3>
+                  <p className="text-gray-600 leading-relaxed">Choose your garment or stitching service, pay securely via Razorpay with no login required.</p>
+                </div>
+                <div className="bg-white p-8 rounded-2xl border border-[#DCE5E1] shadow-sm">
+                  <div className="text-6xl font-bold text-[#14463D] mb-4" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>02</div>
+                  <h3 className="text-2xl font-bold mb-3" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Measure & Discuss</h3>
+                  <p className="text-gray-600 leading-relaxed">Our master tailors in Udaipur record your exact measurements and styling preferences.</p>
+                </div>
+                <div className="bg-white p-8 rounded-2xl border border-[#DCE5E1] shadow-sm">
+                  <div className="text-6xl font-bold text-[#14463D] mb-4" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>03</div>
+                  <h3 className="text-2xl font-bold mb-3" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Stitch & WhatsApp Receipt</h3>
+                  <p className="text-gray-600 leading-relaxed">Your piece is crafted to perfection, and instant digital receipt is dispatched directly to your WhatsApp.</p>
+                </div>
+              </div>
+            </section>
+
+            {/* Contact Section */}
+            <section id="contact" className="bg-[#14463D] text-white py-24 px-4 sm:px-6 lg:px-8">
+              <div className="max-w-7xl mx-auto">
+                <div className="max-w-3xl mb-16">
+                  <span className="text-[#E8A317] font-bold text-xs uppercase tracking-widest">Get In Touch</span>
+                  <h2 className="text-3xl sm:text-5xl font-bold mt-2 mb-4" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>
+                    Visit or Contact Kota Boutique
+                  </h2>
+                  <p className="text-[#E3ECE8] text-lg">We welcome you to our Udaipur studio for personal fittings and fabric selections.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                  <div className="border-t-2 border-[#E8A317] pt-6">
+                    <div className="text-[#E8A317] font-bold text-xs uppercase tracking-widest mb-1">Call Us</div>
+                    <a href="tel:+918955717451" className="text-2xl font-bold hover:underline">+91 89557 17451</a>
+                  </div>
+                  <div className="border-t-2 border-[#E8A317] pt-6">
+                    <div className="text-[#E8A317] font-bold text-xs uppercase tracking-widest mb-1">Studio Address</div>
+                    <div className="text-xl leading-snug">LB 31 Chitrakoot Nagar, Bhuwana, Udaipur, Rajasthan</div>
+                  </div>
+                  <div className="border-t-2 border-[#E8A317] pt-6">
+                    <div className="text-[#E8A317] font-bold text-xs uppercase tracking-widest mb-1">Working Hours</div>
+                    <div className="text-xl">10:00 AM to 6:00 PM (All Days)</div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <a 
+                    href="tel:+918955717451" 
+                    className="bg-[#E8A317] text-[#10231F] px-8 py-4 rounded-full font-bold shadow-lg hover:bg-[#d89510] transition-all"
+                  >
+                    Call Now
+                  </a>
+                  <a 
+                    href="https://wa.me/918955717451" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-[#14463D] transition-all"
+                  >
+                    Message on WhatsApp
+                  </a>
+                </div>
+              </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-[#0B1A17] text-[#B9C8C3] py-8 px-4 text-center text-sm">
+              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span>© 2026 Kota Boutique. All rights reserved.</span>
+                <span>LB 31 Chitrakoot Nagar, Bhuwana, Udaipur, Rajasthan</span>
+              </div>
+            </footer>
+
+            {/* CHECKOUT MODAL */}
+            {isCheckoutOpen && (
+              <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-white rounded-3xl max-w-xl w-full p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                  
+                  <button 
+                    onClick={() => setIsCheckoutOpen(false)} 
+                    className="absolute top-6 right-6 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700"
+                  >
+                    ✕
+                  </button>
+
+                  {checkoutStep === 'form' && (
+                    <div>
+                      <span className="text-[#14463D] font-bold text-xs uppercase tracking-widest">Fast Guest Checkout</span>
+                      <h3 className="text-2xl font-bold mt-1 mb-6" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Complete Your Order</h3>
+                      
+                      <div className="bg-[#F3F6F4] p-4 rounded-2xl mb-6">
+                        <div className="font-bold text-sm mb-2 text-[#14463D]">Selected Items:</div>
+                        {cart.map((item, i) => (
+                          <div key={i} className="flex justify-between text-sm py-1">
+                            <span>{item.name} {item.qty > 1 ? `(x${item.qty})` : ''}</span>
+                            <b>₹{(item.price * item.qty).toLocaleString()}</b>
+                          </div>
+                        ))}
+                        <div className="border-t border-gray-300 mt-3 pt-3 flex justify-between font-bold text-base">
+                          <span>Total Amount:</span>
+                          <span className="text-[#14463D]">₹{cartTotal.toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      <form onSubmit={proceedToRazorpay} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
+                          <input 
+                            type="text" 
+                            required
+                            placeholder="e.g. Priya Sharma"
+                            value={customerInfo.name}
+                            onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14463D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-1">WhatsApp Number (For instant receipt)</label>
+                          <input 
+                            type="tel" 
+                            required
+                            placeholder="e.g. +91 98765 43210"
+                            value={customerInfo.whatsapp}
+                            onChange={(e) => setCustomerInfo({...customerInfo, whatsapp: e.target.value})}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14463D]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-1">Delivery / Fitting Address in Udaipur</label>
+                          <textarea 
+                            required
+                            rows="2"
+                            placeholder="House No, Street, Landmark..."
+                            value={customerInfo.address}
+                            onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14463D]"
+                          ></textarea>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-bold text-gray-700 mb-1">Measurements / Special Notes (Optional)</label>
+                          <input 
+                            type="text" 
+                            placeholder="e.g. Need urgent delivery by Friday"
+                            value={customerInfo.notes}
+                            onChange={(e) => setCustomerInfo({...customerInfo, notes: e.target.value})}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14463D]"
+                          />
+                        </div>
+
+                        <button 
+                          type="submit" 
+                          className="w-full mt-4 bg-[#14463D] text-white py-4 rounded-xl font-bold text-base hover:bg-[#1b5d51] transition-all shadow-lg"
+                        >
+                          Proceed to Secure Payment (Razorpay)
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                  {checkoutStep === 'razorpay' && (
+                    <div className="text-center py-4">
+                      <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-xl shadow-inner">
+                        Rzp
+                      </div>
+                      <h3 className="text-2xl font-bold mb-1" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Razorpay Secure Checkout</h3>
+                      <p className="text-gray-500 text-sm mb-6">Kota Boutique Test Gateway</p>
+
+                      <div className="bg-gray-50 p-4 rounded-2xl mb-6 text-left border">
+                        <div className="flex justify-between text-sm py-1"><span>Payable Amount:</span><b className="text-lg">₹{cartTotal.toLocaleString()}</b></div>
+                        <div className="flex justify-between text-sm py-1"><span>Customer:</span><b>{customerInfo.name}</b></div>
+                        <div className="flex justify-between text-sm py-1"><span>WhatsApp:</span><b>{customerInfo.whatsapp}</b></div>
+                      </div>
+
+                      <div className="space-y-3 mb-8 text-left">
+                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Select Test Payment Mode</div>
+                        <button 
+                          onClick={simulateRazorpayPayment}
+                          className="w-full p-4 border rounded-xl hover:border-[#14463D] hover:bg-green-50 flex items-center justify-between font-bold text-sm transition-all"
+                        >
+                          <span>⚡ Pay via UPI (GPay / PhonePe / Paytm)</span>
+                          <span className="text-green-600">Instant</span>
+                        </button>
+                        <button 
+                          onClick={simulateRazorpayPayment}
+                          className="w-full p-4 border rounded-xl hover:border-[#14463D] hover:bg-green-50 flex items-center justify-between font-bold text-sm transition-all"
+                        >
+                          <span>💳 Credit / Debit Card</span>
+                          <span className="text-green-600">Visa/Mastercard</span>
+                        </button>
+                        <button 
+                          onClick={simulateRazorpayPayment}
+                          className="w-full p-4 border rounded-xl hover:border-[#14463D] hover:bg-green-50 flex items-center justify-between font-bold text-sm transition-all"
+                        >
+                          <span>🏦 Net Banking & Wallets</span>
+                          <span className="text-green-600">All Banks</span>
+                        </button>
+                      </div>
+
+                      <button 
+                        onClick={() => setCheckoutStep('form')}
+                        className="text-sm text-gray-500 hover:underline"
+                      >
+                        ← Back to Details
+                      </button>
+                    </div>
+                  )}
+
+                  {checkoutStep === 'success' && orderReceipt && (
+                    <div className="text-center py-4">
+                      <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow">
+                        ✓
+                      </div>
+                      <h3 className="text-2xl font-bold mb-1" style={{fontFamily: "'Bricolage Grotesque', sans-serif"}}>Payment Successful!</h3>
+                      <p className="text-gray-600 text-sm mb-6">Order ID: <b className="text-[#14463D]">{orderReceipt.orderId}</b></p>
+
+                      <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl mb-6 text-sm flex items-center gap-3 text-left">
+                        <span className="text-2xl">📱</span>
+                        <div>
+                          <b>WhatsApp Receipt Dispatched!</b>
+                          <div className="text-xs text-emerald-700 mt-0.5">
+                            Digital receipt sent successfully to WhatsApp number <span className="font-bold">{orderReceipt.whatsapp}</span> via WhatsApp Business API.
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-50 p-4 rounded-2xl mb-6 text-left text-sm space-y-2">
+                        <div className="font-bold text-gray-700 border-b pb-2">Kota Boutique Receipt Summary</div>
+                        <div><b>Customer Name:</b> {orderReceipt.name}</div>
+                        <div><b>Delivery Address:</b> {orderReceipt.address}</div>
+                        <div><b>Payment ID:</b> {orderReceipt.paymentId}</div>
+                        <div className="pt-2 border-t flex justify-between font-bold text-base">
+                          <span>Total Paid:</span>
+                          <span className="text-[#14463D]">₹{orderReceipt.total.toLocaleString()}</span>
+                        </div>
+                      </div>
+
+                      <button 
+                        onClick={() => {
+                          setCart([]);
+                          setIsCheckoutOpen(false);
+                          setCheckoutStep('form');
+                        }}
+                        className="w-full bg-[#14463D] text-white py-4 rounded-xl font-bold hover:bg-[#1b5d51] transition-all shadow-md"
+                      >
+                        Done / Close
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </x-dc>
+
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</body>
+</html>
